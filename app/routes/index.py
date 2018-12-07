@@ -1,5 +1,6 @@
 from app import flaskPgApp
-from flask import request, json
+from flask import request, json, Response
+from app.decorators.check_bearerToken import token_required
 
 @flaskPgApp.route("/")
 def index():
@@ -9,7 +10,10 @@ def index():
     "success" : True,
     "data" : [],
   }
-  return json.dumps(context), statusCode
+  respData = json.dumps(context)
+  response = Response(respData, status=statusCode)
+  # return json.dumps(context), statusCode
+  return response
 
 @flaskPgApp.route("/hello/<string:name>")
 def sayHello(name):
@@ -80,3 +84,25 @@ def dummyHeaders():
     return json.dumps(context), statusCode
 
 
+@flaskPgApp.route("/dummy/protected/data")
+@token_required
+def sendProtectedData():
+  statusCode = 200
+  context = {
+    "success" : True,
+    "message" : "Token Requirement Decorator working",
+    "data" : [
+      {
+        "id" : 1,
+        "name" : "Dummy"
+      },
+      {
+        "id" : 2,
+        "name" : "Really"
+      }
+    ]
+  }
+  respData = json.dumps(context)
+  response = Response(respData, status=statusCode)
+  return response
+  

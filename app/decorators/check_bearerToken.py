@@ -1,6 +1,6 @@
 from functools import wraps
 import json
-from flask import Response
+from flask import Response, request
 
 def unAuthorizedError():
   statusCode = 401
@@ -13,10 +13,10 @@ def unAuthorizedError():
   return response
 
 def token_required(f):
-
   @wraps(f)
   def decoratedFunc(*args, **kwargs):
-    token = request.headers['Authorization']
+    token = request.headers.get('Authorization')
+    
     if not token:
       return unAuthorizedError()
     
