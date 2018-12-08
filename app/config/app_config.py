@@ -1,2 +1,5 @@
+from app.config.db_info import PGDB_DOCKER_URI, PGDB_LOCALHOST_URI
+
 class AppConfig(object):
-  DEBUG=True
+  SQLALCHEMY_DATABASE_URI = PGDB_DOCKER_URI
+  SQLALCHEMY_TRACK_MODIFICATIONS = False

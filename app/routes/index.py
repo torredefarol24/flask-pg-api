@@ -1,8 +1,8 @@
-from app import flaskPgApp
+from app import flaskPgJwtApp
 from flask import request, json, Response
 from app.decorators.check_bearerToken import token_required
 
-@flaskPgApp.route("/")
+@flaskPgJwtApp.route("/")
 def index():
   statusCode = int(200)
   context = {
@@ -15,7 +15,7 @@ def index():
   # return json.dumps(context), statusCode
   return response
 
-@flaskPgApp.route("/hello/<string:name>")
+@flaskPgJwtApp.route("/hello/<string:name>")
 def sayHello(name):
   statusCode = int(200)
   context = {
@@ -29,7 +29,7 @@ def sayHello(name):
   }
   return json.dumps(context), statusCode
 
-@flaskPgApp.route("/dummy/search")
+@flaskPgJwtApp.route("/dummy/search")
 def dummySearch():
   statusCode = int(200)
   context = {
@@ -43,7 +43,7 @@ def dummySearch():
   }
   return json.dumps(context), statusCode
 
-@flaskPgApp.route("/dummy/post/headers")
+@flaskPgJwtApp.route("/dummy/post/headers")
 def dummyHeaders():
   statusCode = int(200)
   context = {
@@ -84,7 +84,7 @@ def dummyHeaders():
     return json.dumps(context), statusCode
 
 
-@flaskPgApp.route("/dummy/protected/data")
+@flaskPgJwtApp.route("/dummy/protected/data")
 @token_required
 def sendProtectedData():
   statusCode = 200
