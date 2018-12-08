@@ -9,7 +9,7 @@ class User(db.Model):
   # todos = db.relationship("Todo", lazy='select', backref=db.backref('owener, lazy='joined))   
   
   def __repr__(self):
-    return f'<User {self.email}'
+    return f'User {self.email}'
   
   def set_password(self, password):
     self.password = bcrypt.generate_password_hash(password)
@@ -31,7 +31,16 @@ class User(db.Model):
   def toDict(self):
     selfDict = {}
     for column in self.__table__.columns:
+      if column.name == 'password':
+        continue
       selfDict[column.name] = getattr(self, column.name)
     return selfDict
+  
+  def find():
+    return User.query.order_by("id desc").all()
+
+  
+  def findById(id):
+    return User.query.get(id)
 
 

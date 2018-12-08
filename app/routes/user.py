@@ -2,11 +2,12 @@ from app import app, db
 from app.models.User import User
 from app.decorators.check_bearerToken import token_required
 from flask import json, jsonify, request, Response
-from app.helpers.error_funcs import invalid_request_method
-from sqlalchemy.exc import IntegrityError, DataError, SQLAlchemyError, DBAPIError
+from app.helpers.error_funcs import invalid_request_method, invalid_request_headers
+from sqlalchemy.exc import SQLAlchemyError
 
-import pprint
 
+
+@token_required
 @app.route("/users", methods=['GET', 'POST'])
 def users_Index():
   if request.method == 'GET':
@@ -19,8 +20,21 @@ def users_Index():
 
 
 @token_required
+@app.route('/users/<int:id>', methods=['GET', 'PATCH', 'DELETE'])
+def users_WithId(id):
+  if request.method == 'GET':
+    return get_user_byId(id)
+  elif request.method == 'PATCH':
+    return edit_user_byId(id)
+  elif request.method == 'DELETE':
+    return delete_user_byId(id)
+  else:
+    return invalid_request_method()
+
+
+
 def get_all_users():
-  users = User.query.order_by("id desc").all()
+  users = User.find()
   context = {
     "success" : True,
     "message" : "Fetch All Users",
@@ -33,7 +47,6 @@ def get_all_users():
 
 
 
-@token_required
 def register_user():
   header_content_type = request.headers.get("Content-Type")
   statusCode = 201
@@ -45,23 +58,77 @@ def register_user():
   if header_content_type == 'application/json':
     user = User(email=request.json["email"], fullname=request.json["fullname"])
     user.set_password(request.json["password"])
-    try :
-      user.create()
-      context["data"] = user.toDict()
-    # except IntegrityError:
-    #   context['data'] = None
-    #   context['success'] = False
-    #   context['message'] = "Email Taken"
-    #   statusCode = 500
-    # except DataError: 
-    #   context['data'] = None
-    #   context['success'] = False
-    #   context['message'] = "Values Too Long"
-    #   statusCode = 500
-    except SQLAlchemyError as e:
-      context['success'] = False
-      context['message'] = str(e.__dict__['orig'])
-      statusCode = 500
-
-    return jsonify(context), statusCode
+  elif header_content_type =='application/x-www-form-urlencoded':
+    user = User(email=request.form["email"], fullname=request.form["fullname"])
+    user.set_password(request.form["password"])
     
+  try :
+    user.create()
+    context["data"] = user.toDict()
+  except SQLAlchemyError as e:
+    context['success'] = False
+    context['message'] = str(e.__dict__['orig'])
+    statusCode = 500
+  return jsonify(context), statusCode
+
+
+
+def get_user_byId(id):
+  user = User.findById(id)
+  statusCode = 200
+  context = {
+    "success" : True,
+    "message" : "Get User By ID",
+    "data" : {}
+  }
+  if user is not None:
+    context['data'] = user.toDict()
+  else:
+    context['success'] = False
+    context['message'] = "User Doesn't Exist"
+    statusCode = 404
+  return jsonify(context), statusCode
+
+
+
+def edit_user_byId(id):
+  user = User.findById(id)
+  statusCode = 200
+  header_content_type = request.headers.get("Content-Type")
+  context = {
+    "success" : True,
+    "message" : "Update User By ID",
+    "data" : None
+  }
+  if user is not None:
+    if header_content_type == 'application/json':
+      user.fullname = request.json['fullname']
+    elif header_content_type =='application/x-www-form-urlencoded':
+      user.fullname = request.form['fullname']
+    else:
+      return invalid_request_headers()
+    user.save()
+    context['data'] = user.toDict()
+  else:
+    context['success'] = False
+    context['message'] = "User Doesn't Exist"
+    statusCode = 404
+    
+  return jsonify(context), statusCode
+
+
+
+def delete_user_byId(id):
+  user = User.findById(id)
+  statusCode = 200
+  context = {
+    "success" : True,
+    "message" : "Delete User By ID",
+  }
+  if user is not None:
+    user.delete()
+  else:
+    context['success'] = False
+    context['message'] = "User Doesn't Exist"
+    statusCode = 404
+  return jsonify(context), statusCode
