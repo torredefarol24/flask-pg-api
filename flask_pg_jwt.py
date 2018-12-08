@@ -1,1 +1,1 @@
-from app import flaskPgJwtApp
+from app import app

@@ -1,11 +1,11 @@
-from app import flaskPgJwtApp
+from app import app
 from app.models.Todo import Todo
 from flask import json, Response, request, jsonify
 from app.decorators.check_bearerToken import token_required
+from app.helpers.error_funcs import invalid_request_method
 
 
-
-@flaskPgJwtApp.route("/todos", methods=['GET', 'POST'])
+@app.route("/todos", methods=['GET', 'POST'])
 def todos_Create_ReadAll():
   if request.method == 'POST':
     return create_todo()
@@ -16,7 +16,7 @@ def todos_Create_ReadAll():
 
 
 
-@flaskPgJwtApp.route("/todos/<int:id>", methods=['GET', 'PATCH', 'DELETE'])
+@app.route("/todos/<int:id>", methods=['GET', 'PATCH', 'DELETE'])
 def todos_Read_Update_Delete(id):
   if request.method =='GET':
     return get_todo_byId(id)
@@ -134,12 +134,3 @@ def delete_todo_byId(id):
   response = jsonify(result=context)
   return response, statusCode
 
-
-
-def invalid_request_method():
-  context = {
-    "success" : False,
-    "data" : None,
-    "message" : "Invalid Request Method"
-  }
-  return jsonify(error = context), 500

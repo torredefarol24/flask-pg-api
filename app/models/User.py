@@ -2,9 +2,9 @@ from app import db, bcrypt
 
 class User(db.Model):
   id = db.Column(db.Integer, primary_key=True)
-  fullName = db.Column(db.String(120))
+  fullname = db.Column(db.String(120))
   email = db.Column(db.String(120), unique=True, nullable=False)
-  password = db.Column(db.String(120), nullable=False)
+  password = db.Column(db.String(), nullable=False)
   todos = db.relationship('Todo', backref='owner', lazy=True)
   # todos = db.relationship("Todo", lazy='select', backref=db.backref('owener, lazy='joined))   
   
