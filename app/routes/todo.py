@@ -1,7 +1,7 @@
 from app import flaskPgJwtApp
 from app.models.Todo import Todo
 from flask import json, Response, request, jsonify
-import pprint
+from app.decorators.check_bearerToken import token_required
 
 @flaskPgJwtApp.route("/todos", methods=['GET', 'POST'])
 def todosIndex():
@@ -19,17 +19,14 @@ def get_all_todos():
     "message" : "Todos Fetched",
     "data" : []
   }
-  
   for todo in todos:
    context["data"].append(todo.toDict())
-  
   resp_data = json.dumps(context)
   response = Response(resp_data, status=200)
-
   return response
 
 
-
+@token_required
 def create_todo():
   header_content_type = request.headers.get('Content-Type')
   statusCode = 201
@@ -49,7 +46,16 @@ def create_todo():
     context['message'] = "Invalid Headers"
     context["success"] = False
     statusCode = 500
-
   response = jsonify(context)
   return response, statusCode
-  
+
+
+
+@flaskPgJwtApp.route("/todos/<int:id>")
+def get_todo_byId(id):
+  todo = Todo.query.get(id)
+  context = {
+    "success" : True,
+    "message" : "Fetch Todo By Id",
+    "data" : todo.toDict()
+  }
