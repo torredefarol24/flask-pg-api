@@ -2,26 +2,20 @@ from app import api
 from app.models.User import User
 from app.decorators.check_bearerToken import token_required
 from flask_restful import Resource, reqparse
-
+from flask import jsonify, json
 
 class User_List(Resource):
   def get(self):
-    users = User.query.order_by("id desc").all()
+    users = User.find()
     context = {
       "success" : True,
       "message" : "Fetch All Users",
-      "data" : []
+      "data" : json.dumps(users)
     }
-    for user in users:
-      context['data'].append( user.toDict() )
+    # for user in users:
+    #   context['data'].append( user.toDict() )
     
-    return context
-
-regDataParser = reqparse.RequestParser()
-regDataParser.add_argument("fullname", type=str, help="Please Provide Fullname")
-regDataParser.add_argument("email", type=str, help='Please Provide Email')
-regDataParser.add_argument("password", type=str, help='Please Provide Password')
-
+    return jsonify(result=context)
 
 class User_Registration(Resource):
   def post(self):
@@ -31,5 +25,5 @@ class User_Registration(Resource):
     return regData  
 
 
-api.add_resource(User_List, "/users")
-api.add_resource(User_Registration, "/users")
+api.add_resource(User_List, "/resources/users")
+api.add_resource(User_Registration, "/resources/users")

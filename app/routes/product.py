@@ -1,71 +1,68 @@
 from app import app, db
-from app.models.User import User
+from app.models.Product import Product
 from app.decorators.check_bearerToken import token_required
 from flask import json, jsonify, request, Response
 from app.helpers.error_funcs import invalid_request_method, invalid_request_headers
 from sqlalchemy.exc import SQLAlchemyError
 
 
-@app.route("/users", methods=['GET', 'POST'])
-def users_Index():
+
+@app.route("/products", methods=['GET', 'POST'])
+def products_Index():
   if request.method == 'GET':
-    return get_all_users()
+    return get_all_products()
   elif request.method == 'POST':
-    return register_user()
+    return create_product()
   else:
     return invalid_request_method()
 
 
 
-@app.route('/users/<int:id>', methods=['GET', 'PATCH', 'DELETE'])
-def users_WithId(id):
+@app.route('/products/<int:id>', methods=['GET', 'PATCH', 'DELETE'])
+def productsById(id):
   if request.method == 'GET':
-    return get_user_byId(id)
+    return get_product_byId(id)
   elif request.method == 'PATCH':
-    return edit_user_byId(id)
+    return edit_product_byId(id)
   elif request.method == 'DELETE':
-    return delete_user_byId(id)
+    return delete_product_byId(id)
   else:
     return invalid_request_method()
+
 
 
 @token_required
-def get_all_users():
-  users = User.find()
+def get_all_products():
+  products = Product.find()
   context = {
     "success" : True,
-    "message" : "Fetch All Users",
+    "message" : "Fetch All Products",
     "data" : []
   }
-  for user in users:
-    context['data'].append(user.toDict_WithRelations())
-    # print(user.__dict__)
+  for product in products:
+    context['data'].append(product.toDict_WithRelations())
   response = jsonify(context)
   return response, 200
 
 
 
 @token_required
-def register_user():
+def create_product():
   header_content_type = request.headers.get("Content-Type")
   statusCode = 201
   context = {
     "success" : True,
-    "message" : "Create New User",
+    "message" : "Create New Product",
     "data" : None
   }
   if header_content_type == 'application/json':
-    user = User(email=request.json["email"], fullname=request.json["fullname"])
-    user.set_password(request.json["password"])
+    product = Product(name=request.json["name"], details=request.json["details"])
   elif header_content_type =='application/x-www-form-urlencoded':
-    user = User(email=request.form["email"], fullname=request.form["fullname"])
-    user.set_password(request.form["password"])
-  else:
-    return invalid_request_headers()
+    product = Product(name=request.form["name"], details=request.form["details"])
     
   try :
-    user.create()
-    context["data"] = user.toDict_WithRelations()
+    product.create()
+    context["data"] = product.toDict_WithRelations()
   except SQLAlchemyError as e:
     context['success'] = False
     context['message'] = str(e.__dict__['orig'])
@@ -75,46 +72,48 @@ def register_user():
 
 
 @token_required
-def get_user_byId(id):
-  user = User.findById(id)
+def get_product_byId(id):
+  product = Product.findById(id)
   statusCode = 200
   context = {
     "success" : True,
-    "message" : "Get User By ID",
+    "message" : "Get Product By ID",
     "data" : {}
   }
-  if user is not None:
-    context['data'] = user.toDict_WithRelations()
+  if product is not None:
+    context['data'] = product.toDict_WithRelations()
   else:
     context['success'] = False
-    context['message'] = "User Doesn't Exist"
+    context['message'] = "Product Doesn't Exist"
     statusCode = 404
   return jsonify(context), statusCode
 
 
 
 @token_required
-def edit_user_byId(id):
-  user = User.findById(id)
+def edit_product_byId(id):
+  product = Product.findById(id)
   statusCode = 200
   header_content_type = request.headers.get("Content-Type")
   context = {
     "success" : True,
-    "message" : "Update User By ID",
+    "message" : "Update Product By ID",
     "data" : None
   }
-  if user is not None:
+  if product is not None:
     if header_content_type == 'application/json':
-      user.fullname = request.json['fullname']
+      product.name = request.json['name']
+      product.details = request.json['details']
     elif header_content_type =='application/x-www-form-urlencoded':
-      user.fullname = request.form['fullname']
+      product.name = request.form['name']
+      product.details = request.form['details']
     else:
       return invalid_request_headers()
-    user.update()
-    context['data'] = user.toDict_WithRelations()
+    product.update()
+    context['data'] = product.toDict_WithRelations()
   else:
     context['success'] = False
-    context['message'] = "User Doesn't Exist"
+    context['message'] = "Product Doesn't Exist"
     statusCode = 404
     
   return jsonify(context), statusCode
@@ -122,17 +121,17 @@ def edit_user_byId(id):
 
 
 @token_required
-def delete_user_byId(id):
-  user = User.findById(id)
+def delete_product_byId(id):
+  product = Product.findById(id)
   statusCode = 200
   context = {
     "success" : True,
-    "message" : "Delete User By ID",
+    "message" : "Delete Product By ID",
   }
-  if user is not None:
-    user.delete()
+  if product is not None:
+    product.delete()
   else:
     context['success'] = False
-    context['message'] = "User Doesn't Exist"
+    context['message'] = "Product Doesn't Exist"
     statusCode = 404
   return jsonify(context), statusCode
