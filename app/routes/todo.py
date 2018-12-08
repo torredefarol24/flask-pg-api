@@ -57,5 +57,15 @@ def get_todo_byId(id):
   context = {
     "success" : True,
     "message" : "Fetch Todo By Id",
-    "data" : todo.toDict()
+    "data" : None
   }
+
+  if (todo):
+    context["data"] = todo.toDict()
+  else:
+    context["success"] = False
+    
+  respData = json.dumps(context)
+  response = Response(respData, status=200)
+  return response
+
