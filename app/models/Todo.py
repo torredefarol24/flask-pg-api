@@ -8,8 +8,15 @@ class Todo(db.Model):
   def __repr__(self):
     return f'<Todo {self.title}>'
 
-  def save(self):
+  def create(self):
     db.session.add(self)
+    db.session.commit()
+
+  def save(self):
+    db.session.commit()
+
+  def delete(self):
+    db.session.delete(self)
     db.session.commit()
   
   def toDict(self):
