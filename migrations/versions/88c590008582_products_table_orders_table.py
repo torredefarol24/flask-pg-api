@@ -37,7 +37,7 @@ def upgrade():
     sa.Column('product_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['order_id'], ['order.id'], ),
     sa.ForeignKeyConstraint(['product_id'], ['product.id'], ),
-    sa.PrimaryKeyConstraint('id', 'order_id', 'product_id')
+    sa.PrimaryKeyConstraint('id')
     )
     op.alter_column('todo', 'user_id',
                existing_type=sa.INTEGER(),

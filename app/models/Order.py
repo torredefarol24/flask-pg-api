@@ -6,9 +6,10 @@ from app.models.Order_Product import Order_Product
 
 class Order(db.Model):
   id = db.Column(db.Integer, primary_key = True) 
-  created_at = db.Column(db.Date, default=datetime.now())
+  created_at = db.Column(db.Date, default=datetime.now(), nullable=False)
   user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
   products = db.relationship(Order_Product, backref="order", primaryjoin= id == Order_Product.order_id)
+  status = db.Column(db.String(120), default="Ordered", nullable=False)
 
 
   def __repr__(self):
@@ -30,14 +31,14 @@ class Order(db.Model):
 
   
   def find():
-    return Order.query.options(joinedload(Order.products)).get()
+    return Order.query.options(joinedload(Order.products)).all()
 
   
   def findById(id):
     return Order.query.options(joinedload(Order.products)).get(id)
 
   
-  def toDict():
+  def toDict(self):
     selfDict = {}
     for column in self.__table__.columns:
       selfDict[column.name] = getattr(self, column.name)
@@ -46,7 +47,10 @@ class Order(db.Model):
 
   def toDict_WithRelations(self):
     selfDict_WithRel = {}
-    for key in self.__mapper__.relationships.key():
+    for column in self.__table__.columns:
+      selfDict_WithRel[column.name] = getattr(self, column.name)
+
+    for key in self.__mapper__.relationships.keys():
       relation_name = str(self.__mapper__.relationships[key])
       relation_items = getattr(self, key)
       is_list = self.__mapper__.relationships[key].uselist
@@ -57,6 +61,6 @@ class Order(db.Model):
           dictItem = item.toDict()
           selfDict_WithRel[relation_name].append(dictItem)
       else:
-        selfDict_WithRel[relation_name] = item.toDict()
+        selfDict_WithRel[relation_name] = relation_items.toDict()
       
     return selfDict_WithRel
