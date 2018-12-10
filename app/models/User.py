@@ -38,7 +38,6 @@ class User(db.Model):
 
   def toDict(self):
     selfDict = {}
-
     for column in self.__table__.columns:
       if column.name == 'password':
         continue
@@ -48,7 +47,6 @@ class User(db.Model):
 
   def toDict_WithRelations(self):
     selfDict_WithRel = {}
-
     for column in self.__table__.columns:
       if column.name == 'password':
         continue
@@ -71,12 +69,10 @@ class User(db.Model):
     
 
   def find():
-    # return User.query.order_by("id desc").all()
     return User.query.options(joinedload(User.todos), joinedload(User.orders)).all()
 
 
   def findById(id):
-    # return User.query.get(id)
     return User.query.options(joinedload(User.todos), joinedload(User.orders)).get(id)
 
 

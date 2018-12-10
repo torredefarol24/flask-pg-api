@@ -1,5 +1,6 @@
 from app import app
 from app.models.Category import Category
+from app.models.Product import Product
 from app.decorators.check_bearerToken import token_required
 from app.helpers.error_funcs import invalid_request_headers, invalid_request_method
 from sqlalchemy.exc import SQLAlchemyError
@@ -30,7 +31,7 @@ def category_WithId(id):
     return invalid_request_method()
 
 
-
+None
 @token_required
 def get_all_categories():
   categs = Category.find()
@@ -41,7 +42,7 @@ def get_all_categories():
     "data" : []
   }
   for categ in categs:
-    context['data'].append(categ.toDict())
+    context['data'].append(categ.toDict_WithRelations())
   return jsonify(context), statusCode
 
 
@@ -64,7 +65,7 @@ def create_category():
   else:
     return invalid_request_headers()
   categ.create()
-  context['data'] = categ.toDict()
+  context['data'] = categ.toDict_WithRelations()
   return jsonify(context),statusCode
 
 
@@ -79,7 +80,7 @@ def get_category_byId(id):
     "data" : None
   }
   if categ: 
-    context['data'] = categ.toDict()
+    context['data'] = categ.toDict_WithRelations()
   else :
     context['success'] = False
     context['message'] = "Category Doesn't Exist"
@@ -112,7 +113,7 @@ def edit_category_byId(id):
     return jsonify(context), statusCode
   
   categ.update()
-  context['data'] = categ.toDict()
+  context['data'] = categ.toDict_WithRelations()
   return jsonify(context), statusCode
 
 
@@ -132,4 +133,43 @@ def delete_category_byId(id):
     context['success'] = False
     context['message'] = "Category Doesn't Exist"
     statusCode = 404
+  return jsonify(context), statusCode
+
+
+
+@app.route("/category/product/assign", methods=['POST'])
+@token_required
+def assign_product_to_categ():
+  statusCode = 200
+  context = {
+    "message" : "Assign Category to Product",
+    "success" : True,
+    "data" : []
+  }
+  request_header_json = request.headers.get("Content-Type") == 'application/json'
+  request_header_form = request.headers.get("Content-Type") == 'appliactoin/x-www-form-urlencoded'
+
+  if request_header_json:
+    categ = Category.findById(request.json['category_id']) 
+  elif request_header_form:
+    categ = Category.findById(request.form['category_id'])
+  else:
+    return invalid_request_headers()
+
+  if categ and request_header_json:  
+    for id in request.json['product_ids']:
+      product = Product.findById(id)
+      categ.products.append(product)
+  elif categ and request_header_form:
+    for id in request.form['product_ids']:
+      product = Product.findById(id)
+      categ.products.append(product)
+  elif not categ:
+    context['success'] = False,
+    context['message'] = "Category Not Found"
+    statusCode = 404
+    return jsonify(context), statusCode
+
+  categ.update()
+  context['data'] = categ.toDict_WithRelations()
   return jsonify(context), statusCode

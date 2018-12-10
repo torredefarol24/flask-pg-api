@@ -1,14 +1,13 @@
 from app import db
 from datetime import datetime
 from sqlalchemy.orm import joinedload
-from app.models.Order_Product import Order_Product
-
+from app.association_tables.product_order import product_order_table
 
 class Order(db.Model):
   id = db.Column(db.Integer, primary_key = True) 
   created_at = db.Column(db.Date, default=datetime.now(), nullable=False)
   user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-  products = db.relationship(Order_Product, backref="order", primaryjoin = id == Order_Product.order_id)
+  products = db.relationship("Product", secondary=product_order_table, back_populates="orders")
   status = db.Column(db.String(120), default="Ordered", nullable=False)
 
 
@@ -41,6 +40,8 @@ class Order(db.Model):
   def toDict(self):
     selfDict = {}
     for column in self.__table__.columns:
+      if column.name == 'user_id': 
+        continue
       selfDict[column.name] = getattr(self, column.name)
     return selfDict
 
@@ -48,6 +49,8 @@ class Order(db.Model):
   def toDict_WithRelations(self):
     selfDict_WithRel = {}
     for column in self.__table__.columns:
+      if column.name == 'user_id': 
+        continue
       selfDict_WithRel[column.name] = getattr(self, column.name)
 
     for key in self.__mapper__.relationships.keys():

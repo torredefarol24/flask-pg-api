@@ -27,14 +27,17 @@ class Todo(db.Model):
   def toDict(self):
     selfDict = {}
     for column in self.__table__.columns:
+      if column.name == 'user_id': 
+        continue
       selfDict[column.name] = getattr(self, column.name)
-    
     return selfDict
 
   
   def toDict_WithRelations(self):
     selfDict_WithRel = {}
     for column in self.__table__.columns:
+      if column.name == 'user_id': 
+        continue
       selfDict_WithRel[column.name] = getattr(self, column.name)
 
     for key in self.__mapper__.relationships.keys():

@@ -1,13 +1,16 @@
 from app import db
-from app.models.Order_Product import Order_Product
 from sqlalchemy.orm import joinedload
+from app.association_tables.product_category import product_category_table
+from app.association_tables.product_order import product_order_table
+
 
 class Product(db.Model):
   id = db.Column(db.Integer, primary_key = True) 
   name = db.Column(db.String(120), nullable=False)
   details = db.Column(db.String(360))
-  orders = db.relationship(Order_Product, backref="product", primaryjoin = id == Order_Product.product_id)
-  
+  categories = db.relationship("Category", secondary=product_category_table, back_populates="products")
+  orders = db.relationship("Order", secondary=product_order_table, back_populates="products")
+
   
   def __repr__(self):
     return f'Product {self.name}'
@@ -28,11 +31,11 @@ class Product(db.Model):
 
   
   def find():
-    return Product.query.options(joinedload(Product.orders)).all()
+    return Product.query.options(joinedload(Product.orders), joinedload(Product.categories)).all()
 
   
   def findById(id):
-    return Product.query.options(joinedload(Product.orders)).get(id)
+    return Product.query.options(joinedload(Product.orders), joinedload(Product.categories)).get(id)
 
 
   def toDict(self):
