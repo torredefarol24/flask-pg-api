@@ -8,7 +8,7 @@ class Order(db.Model):
   id = db.Column(db.Integer, primary_key = True) 
   created_at = db.Column(db.Date, default=datetime.now(), nullable=False)
   user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-  products = db.relationship(Order_Product, backref="order", primaryjoin= id == Order_Product.order_id)
+  products = db.relationship(Order_Product, backref="order", primaryjoin = id == Order_Product.order_id)
   status = db.Column(db.String(120), default="Ordered", nullable=False)
 
 

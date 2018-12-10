@@ -1,1 +1,1 @@
-from . import Todo, User, Product, Order
+from . import Todo, User, Product, Order, Category

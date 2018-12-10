@@ -1,4 +1,4 @@
-from app import app, db
+from app import app
 from app.models.Product import Product
 from app.decorators.check_bearerToken import token_required
 from flask import json, jsonify, request, Response

@@ -1,7 +1,6 @@
 from app import app
 from app.models.Order import Order
 from app.models.Order_Product import Order_Product
-from app.models.Product import Product
 from app.decorators.check_bearerToken import token_required
 from app.helpers.error_funcs import invalid_request_headers, invalid_request_method
 from sqlalchemy.exc import SQLAlchemyError
@@ -130,28 +129,16 @@ def create_order():
 
   if request_header_json:
     order = Order(user_id=request.json['user_id'], created_at=datetime.now(), status="Order Created")
-    order.create()
-    print (order)
-    # order.create()
-
-    for id in request.json['product_ids']:
-      pass
-      # product = Product.findById(id)
-      # print(product)
-      # order.products.append(product)
-      # order_product = Order_Product(product_id=id, order_id=order.id)
-      # order_product.create()
-    # order.create()
-    # order.products.append(order_product)
-    # order.update()
-    # context['data'] = order.toDict_WithRelations()
-
-    
-    return jsonify(context), statusCode
   elif request_header_form:
-    pass
-    # order = Order(user_id=request.form['user_id'])
+    order = Order(user_id=request.form['user_id'], created_at=datetime.now(), status="Order Created")
   else:
     return invalid_request_headers()
-
+  
+  order.create()
+  
+  for id in request.json['product_ids']:
+    order_product = Order_Product(product_id = id, order_id = order.id)
+    order_product.create()
+  
+  context['data'] = order.toDict_WithRelations()
   return jsonify(context), statusCode

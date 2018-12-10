@@ -1,1 +1,1 @@
-from . import index, todo, user, auth, product, order
+from . import index, todo, user, auth, product, order, category
