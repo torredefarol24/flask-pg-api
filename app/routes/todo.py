@@ -104,10 +104,12 @@ def edit_todo_byId(id):
     context['data'] = request.json
     todo.title = request.json["title"]
     todo.update()
+    todo = Todo.query.get(id)
   elif todo and header_content_type == 'application/x-www-form-urlencoded':
     context["data"] = request.form
     todo.title = request.form["title"]
     todo.update()
+    todo = Todo.query.get(id)
   elif not Todo:
     context["data"] = None
     context["success"] = False

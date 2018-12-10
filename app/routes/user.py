@@ -39,7 +39,6 @@ def get_all_users():
   }
   for user in users:
     context['data'].append(user.toDict_WithRelations())
-    # print(user.__dict__)
   response = jsonify(context)
   return response, 200
 
@@ -111,6 +110,7 @@ def edit_user_byId(id):
     else:
       return invalid_request_headers()
     user.update()
+    user = User.findById(id)
     context['data'] = user.toDict_WithRelations()
   else:
     context['success'] = False

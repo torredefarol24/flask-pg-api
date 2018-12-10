@@ -110,6 +110,7 @@ def edit_product_byId(id):
     else:
       return invalid_request_headers()
     product.update()
+    product = Product.findById(id)
     context['data'] = product.toDict_WithRelations()
   else:
     context['success'] = False

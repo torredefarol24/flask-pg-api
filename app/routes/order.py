@@ -93,6 +93,9 @@ def edit_order_byId(id):
   
   if update_order:
     order.update()
+    order = Order.findById(id)
+    context['data'] = order.toDict_WithRelations()
+
   return jsonify(context), statusCode
 
 

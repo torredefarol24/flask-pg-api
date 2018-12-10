@@ -113,6 +113,7 @@ def edit_category_byId(id):
     return jsonify(context), statusCode
   
   categ.update()
+  categ = Category.findById(id)
   context['data'] = categ.toDict_WithRelations()
   return jsonify(context), statusCode
 

@@ -15,7 +15,7 @@ class User(db.Model):
   
 
   def set_password(self, password):
-    self.password = bcrypt.generate_password_hash(password)
+    self.password = bcrypt.generate_password_hash(password).decode('utf-8')
 
 
   def check_password(self, password):
@@ -34,7 +34,7 @@ class User(db.Model):
   def delete(self):
     db.session.delete()
     db.session.commit()
-  
+
 
   def toDict(self):
     selfDict = {}
@@ -74,5 +74,9 @@ class User(db.Model):
 
   def findById(id):
     return User.query.options(joinedload(User.todos), joinedload(User.orders)).get(id)
+
+  def findByEmail(emailVal):
+    return User.query.filter_by(email=emailVal).first()
+  
 
 
