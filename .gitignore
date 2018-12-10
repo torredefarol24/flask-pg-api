@@ -2,3 +2,6 @@
 venv
 *.pyc
 __pycache__*
+
+app/config/db_info.py
+app/config/jwt_info.py
