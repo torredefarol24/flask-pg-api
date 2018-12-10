@@ -1,9 +1,10 @@
 from app import app
 from app.models.Product import Product
-from app.decorators.check_bearerToken import token_required
+# from app.decorators.check_bearerToken import token_required
 from flask import json, jsonify, request, Response
 from app.helpers.error_funcs import invalid_request_method, invalid_request_headers
 from sqlalchemy.exc import SQLAlchemyError
+from flask_jwt_extended import jwt_required
 
 
 
@@ -31,7 +32,7 @@ def productsById(id):
 
 
 
-@token_required
+@jwt_required
 def get_all_products():
   products = Product.find()
   context = {
@@ -46,7 +47,7 @@ def get_all_products():
 
 
 
-@token_required
+@jwt_required
 def create_product():
   header_content_type = request.headers.get("Content-Type")
   statusCode = 201
@@ -71,7 +72,7 @@ def create_product():
 
 
 
-@token_required
+@jwt_required
 def get_product_byId(id):
   product = Product.findById(id)
   statusCode = 200
@@ -90,7 +91,7 @@ def get_product_byId(id):
 
 
 
-@token_required
+@jwt_required
 def edit_product_byId(id):
   product = Product.findById(id)
   statusCode = 200
@@ -121,7 +122,7 @@ def edit_product_byId(id):
 
 
 
-@token_required
+@jwt_required
 def delete_product_byId(id):
   product = Product.findById(id)
   statusCode = 200

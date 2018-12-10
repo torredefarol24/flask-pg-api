@@ -1,9 +1,10 @@
 from app import app, db
 from app.models.User import User
-from app.decorators.check_bearerToken import token_required
+# from app.decorators.check_bearerToken import token_required
 from flask import json, jsonify, request, Response
 from app.helpers.error_funcs import invalid_request_method, invalid_request_headers
 from sqlalchemy.exc import SQLAlchemyError
+from flask_jwt_extended import jwt_required
 
 
 @app.route("/users", methods=['GET', 'POST'])
@@ -29,7 +30,7 @@ def users_WithId(id):
     return invalid_request_method()
 
 
-@token_required
+@jwt_required
 def get_all_users():
   users = User.find()
   context = {
@@ -44,7 +45,7 @@ def get_all_users():
 
 
 
-@token_required
+@jwt_required
 def register_user():
   header_content_type = request.headers.get("Content-Type")
   statusCode = 201
@@ -73,7 +74,7 @@ def register_user():
 
 
 
-@token_required
+@jwt_required
 def get_user_byId(id):
   user = User.findById(id)
   statusCode = 200
@@ -92,7 +93,7 @@ def get_user_byId(id):
 
 
 
-@token_required
+@jwt_required
 def edit_user_byId(id):
   user = User.findById(id)
   statusCode = 200
@@ -121,7 +122,7 @@ def edit_user_byId(id):
 
 
 
-@token_required
+@jwt_required
 def delete_user_byId(id):
   user = User.findById(id)
   statusCode = 200

@@ -1,11 +1,11 @@
 from app import app
 from app.models.Category import Category
 from app.models.Product import Product
-from app.decorators.check_bearerToken import token_required
+# from app.decorators.check_bearerToken import jwt_required
 from app.helpers.error_funcs import invalid_request_headers, invalid_request_method
 from sqlalchemy.exc import SQLAlchemyError
 from flask import request, jsonify 
-
+from flask_jwt_extended import jwt_required
 
 
 @app.route("/category", methods=['GET', 'POST'])
@@ -32,7 +32,7 @@ def category_WithId(id):
 
 
 None
-@token_required
+@jwt_required
 def get_all_categories():
   categs = Category.find()
   statusCode = 200
@@ -47,7 +47,7 @@ def get_all_categories():
 
 
 
-@token_required
+@jwt_required
 def create_category():
   context = {
     "success" : True,
@@ -70,7 +70,7 @@ def create_category():
 
 
 
-@token_required
+@jwt_required
 def get_category_byId(id):
   categ = Category.findById(id)
   statusCode = 200
@@ -89,7 +89,7 @@ def get_category_byId(id):
 
 
 
-@token_required
+@jwt_required
 def edit_category_byId(id):
   categ = Category.findById(id)
   statusCode = 200
@@ -119,7 +119,7 @@ def edit_category_byId(id):
 
 
 
-@token_required
+@jwt_required
 def delete_category_byId(id):
   categ = Category.findById(id)
   statusCode = 200
@@ -139,7 +139,7 @@ def delete_category_byId(id):
 
 
 @app.route("/category/product/assign", methods=['POST'])
-@token_required
+@jwt_required
 def assign_product_to_categ():
   statusCode = 200
   context = {

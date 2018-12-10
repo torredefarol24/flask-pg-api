@@ -1,11 +1,12 @@
 from app import app
 from app.models.Order import Order
 from app.models.Product import Product
-from app.decorators.check_bearerToken import token_required
+# from app.decorators.check_bearerToken import token_required
 from app.helpers.error_funcs import invalid_request_headers, invalid_request_method
 from sqlalchemy.exc import SQLAlchemyError
 from flask import json, request, jsonify
 from datetime import datetime
+from flask_jwt_extended import jwt_required
 
 
 @app.route("/orders", methods=['GET', 'POST'])
@@ -32,7 +33,7 @@ def orders_WithId(id):
 
 
 
-@token_required
+@jwt_required
 def get_all_orders():
   statusCode = 200
   context = {
@@ -47,7 +48,7 @@ def get_all_orders():
 
 
 
-@token_required
+@jwt_required
 def get_order_byId(id):
   statusCode = 200
   context = {
@@ -65,7 +66,7 @@ def get_order_byId(id):
 
 
 
-@token_required
+@jwt_required
 def edit_order_byId(id):
   statusCode = 200
   context = {
@@ -100,7 +101,7 @@ def edit_order_byId(id):
 
 
 
-@token_required
+@jwt_required
 def delete_order_byId(id):
   statusCode = 200
   context = {
@@ -119,7 +120,7 @@ def delete_order_byId(id):
 
 
 
-@token_required
+@jwt_required
 def create_order():
   statusCode = 201
   context = {
