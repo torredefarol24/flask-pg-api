@@ -2,8 +2,8 @@
 
 - API : Flask 
 - Authentication - JWT
-- Python - v3.7
-- Database - PostgreSQL
+- Python - v3.6
+- Database - PostgreSQL 10.6
 - ORM - SQLAlchemy
 
 
@@ -13,11 +13,15 @@
 ```sh
 $ cd flask-pg-api
 $ touch app/config/db_info.py
+```
 
-# Update db_info.py
-
+- Update **app/config/db_info.py**
+```sh
 PGDB_LOCALHOST_URI = <YOUR_PGDB_URI>
 PGDB_DOCKER_URI = ""
+
+#Remember, the URI Format is
+# <DB_TYPE>://<DB_USERNAME>:<DB_PASSWORD>@<DB_HOST>:<DB_PORT>/<DB_NAME>
 ```
 
 - Update **app/config/app_config.py**
@@ -28,8 +32,6 @@ SQLALCHEMY_DATABASE_URI = PGDB_DOCKER_URI
 #to
 SQLALCHEMY_DATABASE_URI = PGDB_LOCALHOST_URI
 
-#Remember, the URI Format is
-# <DB_TYPE>://<DB_USERNAME>:<DB_PASSWORD>@<DB_HOST>:<DB_PORT>/<DB_NAME>
 ```
 
 - Create your Virtual Environment
@@ -46,7 +48,7 @@ $ source <YOUR_ENV_NAME>/bin/activate
 $ cd flask-pg-api
 
 # After starting the virtual environment
-$ pip install requirements.txt
+$ pip install -r requirements.txt
 ```
 
 - Start App
